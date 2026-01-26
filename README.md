@@ -1,25 +1,20 @@
-# Actual Budget
+## 👋 Welcome to actualbudget 🚀
 
-Actual Budget is a local-first personal finance tool with optional sync capabilities. It's privacy-focused, fast, and gives you complete control over your financial data with zero-based budgeting methodology.
+Self-hosted actualbudget application
 
-## Features
+## 📋 Description
 
-- **Zero-Based Budgeting**: Allocate every dollar before spending
-- **Bank Sync**: Import transactions from financial institutions
-- **Multi-Device Sync**: Optional end-to-end encrypted synchronization
-- **Offline First**: Works completely offline, sync when you want
-- **Reports**: Visualize spending patterns and trends
-- **Goals**: Set and track savings goals
-- **Schedules**: Plan recurring transactions
-- **Rules**: Auto-categorize transactions
-- **Multi-Currency**: Support for multiple currencies
-- **Open Source**: Full control and transparency
+Self-hosted actualbudget application
 
-## Installation
+## 🚀 Services
+
+- **actualbudget**: actualbudget/actual-server:latest
+
+## 📦 Installation
 
 ### Option 1: Quick Install
 ```bash
-curl -q -LSsf "https://raw.githubusercontent.com/composemgr/actualbudget/main/docker-compose.yaml" | docker compose -f - up -d
+curl -q -LSsf "https://raw.githubusercontent.com/composemgr/actualbudget/main/docker-compose.yaml" -o compose.yml
 ```
 
 ### Option 2: Git Clone
@@ -34,40 +29,55 @@ docker compose up -d
 composemgr install actualbudget
 ```
 
-## Configuration
+## 🔧 Configuration
 
-### Ports
+### Environment Variables
 
-- `5006`: Web interface
+```shell
+TZ=America/New_York
+```
 
-## Initial Setup
+See `docker-compose.yaml` for complete list of configurable options.
 
-1. Access Actual Budget at `http://localhost:5006`
-2. Create your first budget or import existing
-3. Set up accounts (checking, savings, credit cards)
-4. Create budget categories
-5. Configure bank sync (optional)
-6. Set up rules for auto-categorization
+## 🌐 Access
 
-## Security Recommendations
+- **Web Interface**: http://172.17.0.1:5006
 
-- **HTTPS**: Use reverse proxy with SSL/TLS
-- **Backups**: Regular backups of budget data
-- **Network Access**: Restrict access with firewall rules
-- **Sync Encryption**: Use end-to-end encryption for sync
-- **Updates**: Keep Actual Budget updated
+## 📂 Volumes
 
-## Backup
+- `./rootfs/data/actualbudget` - Data storage
 
-Critical directories to backup:
-- `./rootfs/data/actualbudget`: All budget files and data
+## 🔍 Logging
 
-## Documentation
+```shell
+docker compose logs -f actualbudget
+```
 
-- Official Documentation: https://actualbudget.org/docs/
-- GitHub: https://github.com/actualbudget/actual-server
-- Community: https://discord.gg/pRYNYr4W5A
+## 🛠️ Management
 
-## License
+```bash
+# Start services
+docker compose up -d
 
-Actual Budget is licensed under the MIT License.
+# Stop services
+docker compose down
+
+# Update to latest images
+docker compose pull && docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Restart services
+docker compose restart
+```
+
+## 📋 Requirements
+
+- Docker Engine 20.10+
+- Docker Compose V2+
+
+## 🤝 Author
+
+🤖 casjay: [Github](https://github.com/casjay) 🤖  
+🦄 composemgr: [Github](https://github.com/composemgr) 🦄
