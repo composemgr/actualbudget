@@ -19,7 +19,7 @@ services:
     environment:
       TZ: ${TZ:-America/New_York}
     volumes:
-      - ./rootfs/data/actualbudget:/data
+      - ./volumes/data/actualbudget:/data
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://localhost:5006"]
       interval: 30s
