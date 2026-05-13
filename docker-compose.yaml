@@ -15,12 +15,32 @@ services:
     hostname: ${BASE_HOST_NAME:-$HOSTNAME}
     restart: always
     logging: *default-logging
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://actualbudget-app:5006'
+      - 'cloudflare.hostname=actualbudget.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.actualbudget-app.entrypoints=http'
+      - 'traefik.http.routers.actualbudget-app-secure.tls=true'
+      - 'traefik.http.routers.actualbudget-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.actualbudget-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.actualbudget-app.middlewares=actualbudget-app-https-redirect'
+      - 'traefik.http.routers.actualbudget-app-secure.entrypoints=https'
+      - 'traefik.http.routers.actualbudget-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.actualbudget-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.actualbudget-app-secure.service=actualbudget-app'
+      - 'traefik.http.services.actualbudget-app.loadbalancer.server.port=5006'
     networks:
       - actualbudget
+      - proxy
+      - cloudflare
     ports:
       - "172.17.0.1:5006:5006"
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: actualbudget-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     volumes:
       - ./volumes/data/actualbudget:/data
     healthcheck:
@@ -32,3 +52,7 @@ services:
 networks:
   actualbudget:
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
