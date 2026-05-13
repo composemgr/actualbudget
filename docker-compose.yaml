@@ -1,5 +1,6 @@
 # nginx proxy address - http://172.17.0.1:5006
 
+name: actualbudget
 x-logging: &default-logging
   driver: json-file
   options:
@@ -9,13 +10,15 @@ x-logging: &default-logging
 services:
   actualbudget:
     image: actualbudget/actual-server:latest
+    pull_policy: always
     container_name: actualbudget-app
-    restart: unless-stopped
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
     logging: *default-logging
     networks:
       - actualbudget
     ports:
-      - "5006:5006"
+      - "172.17.0.1:5006:5006"
     environment:
       TZ: ${TZ:-America/New_York}
     volumes:
