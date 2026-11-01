@@ -1,0 +1,49 @@
+name: actualbudget
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: actualbudget/actual-server:latest
+    container_name: actualbudget-app
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: actualbudget-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    volumes:
+      - './volumes/data/actualbudget:/data'
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:5006']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.docker.network=traefik'
+      - 'traefik.http.routers.actualbudget-app.entrypoints=http'
+      - 'traefik.http.routers.actualbudget-app.rule=Host(`${BASE_HOST_NAME:-$HOSTNAME}`)'
+      - 'traefik.http.routers.actualbudget-app.middlewares=actualbudget-app-https-redirect'
+      - 'traefik.http.middlewares.actualbudget-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.actualbudget-app-secure.entrypoints=https'
+      - 'traefik.http.routers.actualbudget-app-secure.rule=Host(`${BASE_HOST_NAME:-$HOSTNAME}`)'
+      - 'traefik.http.routers.actualbudget-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.actualbudget-app-secure.service=actualbudget-app'
+      - 'traefik.http.services.actualbudget-app.loadbalancer.server.port=5006'
+    networks:
+      - actualbudget
+      - traefik
+
+networks:
+  actualbudget:
+    name: actualbudget
+    external: false
+  traefik:
+    external: true

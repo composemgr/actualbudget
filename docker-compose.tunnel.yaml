@@ -1,0 +1,41 @@
+name: actualbudget
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: actualbudget/actual-server:latest
+    container_name: actualbudget-app
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: actualbudget-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+    volumes:
+      - './volumes/data/actualbudget:/data'
+    healthcheck:
+      test: ['CMD', 'wget', '-q', '--spider', 'http://localhost:5006']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - 'cloudflare.enable=true'
+      - 'cloudflare.service=http://actualbudget-app:5006'
+      - 'cloudflare.hostname=${BASE_HOST_NAME:-$HOSTNAME}'
+    networks:
+      - actualbudget
+      - cloudflare
+
+networks:
+  actualbudget:
+    name: actualbudget
+    external: false
+  cloudflare:
+    external: true
